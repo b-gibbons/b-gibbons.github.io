@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<!-- saved from url=(0093)https://moodle.city.ac.uk/pluginfile.php/2110666/mod_resource/content/2/template.html?embed=1 -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+ <style type="text/css">
+   body{
+      background-color:rgb(50,50,50);
+      color:white
+   }
+   a{
+      color:rgb(210,210,255)
+   }
+   img{
+      margin: 15px 15px 15px 15px
+   }
+   hr{
+      border-top: 1px solid gray;
+   }
+   .infotd{
+     vertical-align:top
+   }
+ </style>
+<script type="text/javascript">// Promises 
+var _eid_promises = {}; 
+// Turn the incoming message from extension 
+// into pending Promise resolving 
+window.addEventListener("message", function(event) { 
+    if(event.source !== window) return; 
+    if(event.data.src && (event.data.src === "background.js")) { 
+        console.log("Page received: "); 
+        console.log(event.data); 
+        // Get the promise 
+        if(event.data.nonce) { 
+            var p = _eid_promises[event.data.nonce]; 
+            // resolve 
+            if(event.data.result === "ok") { 
+                if(event.data.signature !== undefined) { 
+                    p.resolve({hex: event.data.signature}); 
+                } else if(event.data.version !== undefined) { 
+                    p.resolve(event.data.extension + "/" + event.data.version); 
+                } else if(event.data.cert !== undefined) { 
+                    p.resolve({hex: event.data.cert}); 
+                } else { 
+                    console.log("No idea how to handle message"); 
+                    console.log(event.data); 
+                } 
+            } else { 
+                // reject 
+                p.reject(new Error(event.data.result)); 
+            } 
+            delete _eid_promises[event.data.nonce]; 
+        } else { 
+            console.log("No nonce in event msg"); 
+        } 
+    } 
+}, false); 
+ 
+ 
+function TokenSigning() { 
+    function nonce() { 
+        var val = ""; 
+        var hex = "abcdefghijklmnopqrstuvwxyz0123456789"; 
+        for(var i = 0; i < 16; i++) val += hex.charAt(Math.floor(Math.random() * hex.length)); 
+        return val; 
+    } 
+ 
+    function messagePromise(msg) { 
+        return new Promise(function(resolve, reject) { 
+            // amend with necessary metadata 
+            msg["nonce"] = nonce(); 
+            msg["src"] = "page.js"; 
+            // send message 
+            window.postMessage(msg, "*"); 
+            // and store promise callbacks 
+            _eid_promises[msg.nonce] = { 
+                resolve: resolve, 
+                reject: reject 
+            }; 
+        }); 
+    } 
+    this.getCertificate = function(options) { 
+        var msg = {type: "CERT", lang: options.lang, filter: options.filter}; 
+        console.log("getCertificate()"); 
+        return messagePromise(msg); 
+    }; 
+    this.sign = function(cert, hash, options) { 
+        var msg = {type: "SIGN", cert: cert.hex, hash: hash.hex, hashtype: hash.type, lang: options.lang, info: options.info}; 
+        console.log("sign()"); 
+        return messagePromise(msg); 
+    }; 
+    this.getVersion = function() { 
+        console.log("getVersion()"); 
+        return messagePromise({ 
+            type: "VERSION" 
+        }); 
+    }; 
+}</script></head>
+
+<body style="background-color:rgb(50,50,50); color:white">
+<table width="1000px">
+  <tbody><tr>
+    <td class="infotd">
+      <h3>Ben Gibbons</h3>
+      <p> City, University of London class of 2024
+          
+      </p> 
+    </td>
+    <td>
+	<img src="./index_files/imageofyou.png" width="300px">
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2">
+	<hr>
+    </td>
+  </tr>
+
+ <tr>
+  <td class="infotd">
+    <h3>Bootcamp 2020: Would You Rather?</h3>
+    <p>
+    The first (technically second, but the first didnt fit into the categories) programming project completed as a student at City. It makes use of libraries (Jedis), Network Communication (Connecting to a Redis instance) and arrays, conditions and interaction.
+    The category that my project fits in to is "Just 100 lines of code" - coming in at 97 lines after auto-format! This game enables you to select from a variety of Would You Rather options, and compare your choice to other people, seeing if you're weird or not!
+    
+    </p>
+
+    <p>
+      Check out the code on Github: <a href="https://radujianu.github.io/">https://radujianu.github.io/</a>
+    </p>
+  </td><td>
+	<video width="429" height="200" controls="">
+	<source src="Untitled.mp4" type="video/mp4">
+	</video>
+  </td><td>
+  </td>
+</tr><tr>
+ <td colspan="2" align="center">
+	<img src="./index_files/pic1.png" width="285px">
+	<img src="./index_files/pic2.png" width="265px">
+	<img src="./index_files/pic3.png" width="255px">
+ </td>
+</tr>
+ 
+</tbody></table>
+
+</body></html>
